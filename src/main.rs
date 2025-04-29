@@ -1,4 +1,5 @@
-use axum::{Router, response::Html, routing::get};
+use axum::{Json, Router, routing::get};
+use serde::Serialize;
 
 #[tokio::main]
 async fn main() {
@@ -13,6 +14,14 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn hello_world() -> Html<&'static str> {
-    Html("<div>Hello World</div>")
+#[derive(Serialize)]
+struct HelloWorlResp {
+    message: String,
+}
+
+async fn hello_world() -> Json<HelloWorlResp> {
+    let resp = HelloWorlResp {
+        message: "Hello World".to_string(),
+    };
+    Json(resp)
 }
