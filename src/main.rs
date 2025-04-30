@@ -19,29 +19,31 @@ async fn main() {
 }
 
 #[derive(Serialize)]
-struct HelloWorlResp {
+struct HelloWorldResponse {
     message: String,
 }
 
-async fn hello_world() -> Json<HelloWorlResp> {
-    let resp = HelloWorlResp {
+async fn hello_world() -> Json<HelloWorldResponse> {
+    let resp = HelloWorldResponse {
         message: "Hello World".to_string(),
     };
     Json(resp)
 }
 
-async fn hello_world_options(Path(opt): Path<i8>) -> Json<HelloWorlResp> {
+async fn hello_world_options(Path(opt): Path<i8>) -> Json<HelloWorldResponse> {
     let resp = match opt {
-        0 => HelloWorlResp {
+        0 => HelloWorldResponse {
             message: "ゼロ".to_string(),
         },
-        1 => HelloWorlResp {
+        1 => HelloWorldResponse {
             message: "Itchy".to_string(),
         },
-        _ => HelloWorlResp {
+        _ => HelloWorldResponse {
             message: "-_-".to_string(),
         },
     };
 
     Json(resp)
 }
+
+async fn hello_world_submit(Json(HellowWorldReq
