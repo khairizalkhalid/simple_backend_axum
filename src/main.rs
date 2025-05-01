@@ -1,13 +1,18 @@
 use std::i8;
 
-use axum::{Json, Router, extract::Path, routing::get};
-use serde::Serialize;
+use axum::{
+    Json, Router,
+    extract::Path,
+    routing::{get, post},
+};
+use serde::{Deserialize, Serialize};
 
 #[tokio::main]
 async fn main() {
     let app = Router::new()
         .route("/hello-world", get(hello_world))
-        .route("/hello-world/{opt}", get(hello_world_options));
+        .route("/hello-world/{opt}", get(hello_world_options))
+        .route("/hello-world-submit", post(hello_world_submit));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
@@ -16,6 +21,12 @@ async fn main() {
     println!("Start listening on {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app).await.unwrap();
+}
+
+#[derive(Deserialize)]
+struct HelloWorldRequest {
+    name: String,
+    message: String,
 }
 
 #[derive(Serialize)]
@@ -46,4 +57,9 @@ async fn hello_world_options(Path(opt): Path<i8>) -> Json<HelloWorldResponse> {
     Json(resp)
 }
 
-async fn hello_world_submit(Json(HellowWorldReq
+#[axum::debug_handler]
+async fn hello_world_submit(Json(request): Json<HelloWorldRequest>) -> Json<HelloWorldResponse> {
+    let response = format!("Hello World from {}! \"{}\"", request.name, request.message);
+
+    Json(HelloWorldResponse { message: response })
+}
