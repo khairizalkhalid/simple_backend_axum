@@ -20,7 +20,8 @@ async fn main() {
     let app = Router::new()
         .route("/hello-world", get(hello_world))
         .route("/hello-world/{opt}", get(hello_world_options))
-        .route("/hello-world-submit", post(hello_world_submit));
+        .route("/hello-world-submit", post(hello_world_submit))
+        .with_state(db_conn);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
@@ -66,8 +67,21 @@ async fn hello_world_options(Path(opt): Path<i8>) -> Json<HelloWorldResponse> {
 }
 
 #[axum::debug_handler]
-async fn hello_world_submit(Json(request): Json<HelloWorldRequest>) -> Json<HelloWorldResponse> {
+async fn hello_world_submit(
+    db_conn: axum::extract::State<Arc<Mutex<Connection>>>,
+    Json(request): Json<HelloWorldRequest>,
+) -> Json<HelloWorldResponse> {
     let response = format!("Hello World from {}! \"{}\"", request.name, request.message);
+
+    {
+        let db_conn = db_conn.lock().unwrap();
+        db_conn
+            .execute(
+                "INSERT INTO hello_world_messages (name, message) VALUES (?1, ?2)",
+                params![request.name, request.message],
+            )
+            .unwrap();
+    }
 
     Json(HelloWorldResponse { message: response })
 }
