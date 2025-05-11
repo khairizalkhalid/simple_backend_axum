@@ -1,14 +1,22 @@
-use std::i8;
+use std::{
+    i8,
+    sync::{Arc, Mutex},
+};
 
 use axum::{
     Json, Router,
     extract::Path,
     routing::{get, post},
 };
+use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
 
 #[tokio::main]
 async fn main() {
+    let path = "./axum.test.db";
+    let db_conn = Arc::new(Mutex::new(Connection::open(path).unwrap()));
+    init_db(&db_conn).await;
+
     let app = Router::new()
         .route("/hello-world", get(hello_world))
         .route("/hello-world/{opt}", get(hello_world_options))
@@ -62,4 +70,17 @@ async fn hello_world_submit(Json(request): Json<HelloWorldRequest>) -> Json<Hell
     let response = format!("Hello World from {}! \"{}\"", request.name, request.message);
 
     Json(HelloWorldResponse { message: response })
+}
+
+async fn init_db(db_conn: &Arc<Mutex<Connection>>) {
+    let conn = db_conn.lock().unwrap();
+    conn.execute(
+        "CREATE TABLE hello_world_messages ( 
+            id INTEGER PRIMARY KEY, 
+            name TEXT NOT NULL, 
+            message TEXT NOT NULL
+        )",
+        [],
+    )
+    .unwrap();
 }
