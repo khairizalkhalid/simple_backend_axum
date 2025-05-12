@@ -11,11 +11,12 @@ use axum::{
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
 
+mod config;
+
 #[tokio::main]
 async fn main() {
-    let path = "./axum.test.db";
-    let db_conn = Arc::new(Mutex::new(Connection::open(path).unwrap()));
-    init_db(&db_conn).await;
+    let db_conn = config::sqllite::connect();
+    config::sqllite::init_db(&db_conn);
 
     let app = Router::new()
         .route("/hello-world", get(hello_world))
@@ -84,17 +85,4 @@ async fn hello_world_submit(
     }
 
     Json(HelloWorldResponse { message: response })
-}
-
-async fn init_db(db_conn: &Arc<Mutex<Connection>>) {
-    let conn = db_conn.lock().unwrap();
-    conn.execute(
-        "CREATE TABLE hello_world_messages ( 
-            id INTEGER PRIMARY KEY, 
-            name TEXT NOT NULL, 
-            message TEXT NOT NULL
-        )",
-        [],
-    )
-    .unwrap();
 }
