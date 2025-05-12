@@ -1,3 +1,5 @@
+mod config;
+
 use std::{
     i8,
     sync::{Arc, Mutex},
@@ -10,8 +12,6 @@ use axum::{
 };
 use rusqlite::{Connection, params};
 use serde::{Deserialize, Serialize};
-
-mod config;
 
 #[tokio::main]
 async fn main() {
