@@ -1,4 +1,5 @@
 mod config;
+mod dto;
 
 use std::{
     i8,
@@ -10,8 +11,8 @@ use axum::{
     extract::Path,
     routing::{get, post},
 };
+use dto::hello_world::{HelloWorldRequest, HelloWorldResponse};
 use rusqlite::{Connection, params};
-use serde::{Deserialize, Serialize};
 
 #[tokio::main]
 async fn main() {
@@ -31,17 +32,6 @@ async fn main() {
     println!("Start listening on {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app).await.unwrap();
-}
-
-#[derive(Deserialize)]
-struct HelloWorldRequest {
-    name: String,
-    message: String,
-}
-
-#[derive(Serialize)]
-struct HelloWorldResponse {
-    message: String,
 }
 
 async fn hello_world() -> Json<HelloWorldResponse> {
