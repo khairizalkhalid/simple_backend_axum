@@ -1,0 +1,35 @@
+use rusqlite::params;
+use std::sync::{Arc, Mutex};
+
+use crate::dto::hello_world::{HelloWorldRequest, HelloWorldResponse};
+
+pub fn get_hellow_world() -> HelloWorldResponse {
+    HelloWorldResponse {
+        message: "Hello World".to_string(),
+    }
+}
+
+pub fn get_message_for_option(opt: i8) -> HelloWorldResponse {
+    HelloWorldResponse {
+        message: match opt {
+            0 => "ゼロ".to_string(),
+            1 => "Itchy".to_string(),
+            _ => "-_-".to_string(),
+        },
+    }
+}
+
+pub fn save_message(
+    db_conn: &Arc<Mutex<rusqlite::Connection>>,
+    request: HelloWorldRequest,
+) -> rusqlite::Result<String> {
+    let response = format!("Hello World from {}! \"{}\"", request.name, request.message);
+
+    let conn = db_conn.lock().unwrap();
+    conn.execute(
+        "INSERT INTO hello_world_messages (name, message) VALUES (?1, ?2)",
+        params![request.name, request.message],
+    )?;
+
+    Ok(response)
+}

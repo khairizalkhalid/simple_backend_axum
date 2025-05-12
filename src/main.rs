@@ -1,6 +1,7 @@
 mod config;
 mod dto;
 mod handlers;
+mod services;
 
 use axum::{
     Router,
