@@ -1,18 +1,12 @@
 mod config;
 mod dto;
-
-use std::{
-    i8,
-    sync::{Arc, Mutex},
-};
+mod handlers;
 
 use axum::{
-    Json, Router,
-    extract::Path,
+    Router,
     routing::{get, post},
 };
-use dto::hello_world::{HelloWorldRequest, HelloWorldResponse};
-use rusqlite::{Connection, params};
+use handlers::hello_world::{hello_world, hello_world_options, hello_world_submit};
 
 #[tokio::main]
 async fn main() {
@@ -32,47 +26,4 @@ async fn main() {
     println!("Start listening on {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app).await.unwrap();
-}
-
-async fn hello_world() -> Json<HelloWorldResponse> {
-    let resp = HelloWorldResponse {
-        message: "Hello World".to_string(),
-    };
-    Json(resp)
-}
-
-async fn hello_world_options(Path(opt): Path<i8>) -> Json<HelloWorldResponse> {
-    let resp = match opt {
-        0 => HelloWorldResponse {
-            message: "ゼロ".to_string(),
-        },
-        1 => HelloWorldResponse {
-            message: "Itchy".to_string(),
-        },
-        _ => HelloWorldResponse {
-            message: "-_-".to_string(),
-        },
-    };
-
-    Json(resp)
-}
-
-#[axum::debug_handler]
-async fn hello_world_submit(
-    db_conn: axum::extract::State<Arc<Mutex<Connection>>>,
-    Json(request): Json<HelloWorldRequest>,
-) -> Json<HelloWorldResponse> {
-    let response = format!("Hello World from {}! \"{}\"", request.name, request.message);
-
-    {
-        let db_conn = db_conn.lock().unwrap();
-        db_conn
-            .execute(
-                "INSERT INTO hello_world_messages (name, message) VALUES (?1, ?2)",
-                params![request.name, request.message],
-            )
-            .unwrap();
-    }
-
-    Json(HelloWorldResponse { message: response })
 }
