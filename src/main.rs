@@ -1,6 +1,7 @@
 mod config;
 mod dto;
 mod handlers;
+mod repository;
 mod services;
 
 use axum::{
