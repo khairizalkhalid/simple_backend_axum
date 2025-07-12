@@ -15,8 +15,11 @@ pub async fn hello_world() -> Json<HelloWorldResponse> {
     Json(hello_world::get_hellow_world())
 }
 
-pub async fn hello_world_options(Path(opt): Path<i8>) -> Json<HelloWorldResponse> {
-    Json(hello_world::get_message_for_option(opt))
+pub async fn hello_world_options(
+    db_conn: extract::State<Arc<Mutex<Connection>>>,
+    Path(opt): Path<i8>) -> Json<HelloWorldResponse> {
+    let response = hello_world::get_message_for_option(&db_conn, opt).unwrap();
+    Json(response)
 }
 
 #[axum::debug_handler]

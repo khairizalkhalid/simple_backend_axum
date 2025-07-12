@@ -11,14 +11,14 @@ pub fn get_hellow_world() -> HelloWorldResponse {
     }
 }
 
-pub fn get_message_for_option(opt: i8) -> HelloWorldResponse {
-    HelloWorldResponse {
-        message: match opt {
-            0 => "ゼロ".to_string(),
-            1 => "Itchy".to_string(),
-            _ => "-_-".to_string(),
-        },
-    }
+pub fn get_message_for_option(
+    db_conn: &Arc<Mutex<rusqlite::Connection>>,
+    opt: i8,
+) -> rusqlite::Result<HelloWorldResponse> {
+    let conn = db_conn.lock().unwrap();
+    let response = hello_world_messages::get_messages(&conn, &opt);
+
+    Ok(response)
 }
 
 pub fn save_message(
