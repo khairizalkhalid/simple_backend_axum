@@ -25,3 +25,11 @@ pub fn get_messages(conn: &Connection, id: &i8) -> HelloWorldResponse {
         message: "No message found".to_string(),
     }
 }
+
+pub fn delete_message(conn: &Connection, id: i8) -> String {
+    let result = conn.execute("DELETE FROM hello_world_messages WHERE id = ?1", params![id]);
+    match result {
+        Ok(_) => format!("Message with id {} deleted successfully", id),
+        Err(_) => format!("Failed to delete message with id {}", id),
+    }
+}

@@ -5,10 +5,9 @@ mod repository;
 mod services;
 
 use axum::{
-    Router,
-    routing::{get, post},
+    routing::{delete, get, post}, Router
 };
-use handlers::hello_world::{hello_world, hello_world_options, hello_world_submit};
+use handlers::hello_world::{hallow_world, hello_world, hello_world_options, hello_world_submit};
 
 #[tokio::main]
 async fn main() {
@@ -19,6 +18,7 @@ async fn main() {
         .route("/hello-world", get(hello_world))
         .route("/hello-world/{opt}", get(hello_world_options))
         .route("/hello-world-submit", post(hello_world_submit))
+        .route("/hallow-world/{id}", delete(hallow_world))
         .with_state(db_conn);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")

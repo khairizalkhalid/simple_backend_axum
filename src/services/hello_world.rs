@@ -33,3 +33,12 @@ pub fn save_message(
 
     Ok(response)
 }
+
+pub fn delete_message(
+    db_conn: &Arc<Mutex<rusqlite::Connection>>,
+    opt: i8,
+) -> rusqlite::Result<String> {
+    let conn = db_conn.lock().unwrap();
+    let response = hello_world_messages::delete_message(&conn, opt);
+    Ok(response)
+}
