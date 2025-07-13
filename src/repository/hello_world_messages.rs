@@ -10,6 +10,14 @@ pub fn save_message(conn: &Connection, name: &str, message: &str) {
     .unwrap();
 }
 
+pub fn update_message(conn: &Connection, id: i8, name: &str, message: &str) {
+    conn.execute(
+        "UPDATE hello_world_messages SET name = ?1, message = ?2 WHERE id = ?3",
+        params![name, message, id],
+    )
+    .unwrap();
+}
+
 pub fn get_messages(conn: &Connection, id: &i8) -> HelloWorldResponse {
     let mut stmt = conn.prepare("SELECT id, name, message FROM hello_world_messages WHERE id = ?1").unwrap();
     let mut rows = stmt.query(params![id]).unwrap();

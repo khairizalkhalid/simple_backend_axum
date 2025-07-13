@@ -7,7 +7,7 @@ mod services;
 use axum::{
     routing::{delete, get, post}, Router
 };
-use handlers::hello_world::{hallow_world, hello_world, hello_world_options, hello_world_submit};
+use handlers::hello_world::{hallow_world, hello_world, hello_world_options, hello_world_submit, update_hello_world};
 
 #[tokio::main]
 async fn main() {
@@ -18,6 +18,7 @@ async fn main() {
         .route("/hello-world", get(hello_world))
         .route("/hello-world/{opt}", get(hello_world_options))
         .route("/hello-world-submit", post(hello_world_submit))
+        .route("/update-hello-world/{id}", post(update_hello_world))
         .route("/hallow-world/{id}", delete(hallow_world))
         .with_state(db_conn);
 

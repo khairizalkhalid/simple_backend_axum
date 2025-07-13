@@ -34,6 +34,25 @@ pub fn save_message(
     Ok(response)
 }
 
+pub fn update_message(
+    db_conn: &Arc<Mutex<rusqlite::Connection>>,
+    id: i8,
+    request: HelloWorldRequest,
+) -> rusqlite::Result<String> {
+    let response = format!("Hello World from {}! \"{}\"", request.name, request.message);
+
+    let conn = db_conn.lock().unwrap();
+
+    hello_world_messages::update_message(
+        &conn,
+        id,
+        &request.name,
+        &request.message,
+    );
+
+    Ok(response)
+}
+
 pub fn delete_message(
     db_conn: &Arc<Mutex<rusqlite::Connection>>,
     opt: i8,

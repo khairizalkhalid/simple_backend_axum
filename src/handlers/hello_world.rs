@@ -32,6 +32,16 @@ pub async fn hello_world_submit(
 }
 
 #[axum::debug_handler]
+pub async fn update_hello_world(
+    db_conn: extract::State<Arc<Mutex<Connection>>>,
+    Path(id): Path<i8>,
+    Json(request): Json<HelloWorldRequest>,
+) -> Json<HelloWorldResponse> {
+    let response = hello_world::update_message(&db_conn, id, request).unwrap();
+    Json(HelloWorldResponse { message: response })
+}
+
+#[axum::debug_handler]
 pub async fn hallow_world(
     db_conn: extract::State<Arc<Mutex<Connection>>>,
     Path(opt): Path<i8>,
